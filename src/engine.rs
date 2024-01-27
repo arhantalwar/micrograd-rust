@@ -2,19 +2,19 @@ use std::ops::Add;
 use std::ops::Mul;
 
 trait Backpropagation {
-    fn backward(self);
+    fn backward(&self);
 }
 
 #[derive(Debug)]
 #[allow(dead_code)]
 pub struct Value {
-    data: f64,
-    grad: f64,
-    prev: Vec<Value>,
+    pub data: f64,
+    pub grad: f64,
+    pub prev: Vec<Value>,
 }
 
 impl Backpropagation for Value {
-    fn backward(self) {
+    fn backward(&self) {
     }
 }
 
@@ -22,8 +22,8 @@ impl Add for Value {
     type Output = Value;
 
     fn add(self, rhs: Self) -> Self::Output {
-        let out = Value::new(self.data + rhs.data, vec![self, rhs]);
-        out.add_backward_pass();
+        let mut out = Value::new(self.data + rhs.data, vec![self, rhs]);
+        out.backward_pass_add();
         return out;
     }
 }
@@ -32,8 +32,8 @@ impl Mul for Value {
     type Output = Value;
 
     fn mul(self, rhs: Self) -> Self::Output {
-        let out = Value::new(self.data * rhs.data, vec![self, rhs]);
-        out.mul_backward_pass();
+        let mut out = Value::new(self.data * rhs.data, vec![self, rhs]);
+        out.backward_pass_mul();
         return out;
 
     }
@@ -45,13 +45,24 @@ impl Value {
         Value { data, grad: 0.0, prev: children }
     }
 
-    pub fn add_backward_pass(&self) {
-        println!("Adding -> {:?}", self);
+    pub fn backward_pass_add(&mut self) {
+        self.prev[0].data += self.grad;
+        self.prev[1].data += self.grad;
     }
 
-    pub fn mul_backward_pass(&self) {
-        println!("Multiplying -> {:?}", self);
+    pub fn backward_pass_mul(&mut self) {
+        self.prev[0].data += self.prev[1].data * self.grad;
+        self.prev[1].data += self.prev[0].data * self.grad;
+    }
 
+    pub fn backward_pass_sigmoid(&mut self) {
+        self.prev[0].grad +=  ((1.0 / (1.0 + (-self.data).exp())) * (1.0 - (1.0 / (1.0 + (-self.data).exp())))) * self.grad;
+    }
+
+    pub fn sigmoid(self) -> Value {
+        let mut out = Value::new(1.0 / (1.0 + (-self.data).exp()), vec![self, ]);
+        out.backward_pass_sigmoid();
+        return out;
     }
 
 }
