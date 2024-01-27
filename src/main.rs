@@ -1,34 +1,5 @@
-use std::ops::Add;
-use std::ops::Mul;
-
-#[derive(Debug)]
-struct Value {
-    data: f64,
-    grad: f64,
-    prev: Vec<Value>
-}
-
-impl Value {
-    fn new(data: f64, children: Vec<Value>) -> Value {
-        Value { data, grad: 0.0, prev: children }
-    }
-}
-
-impl Add for Value {
-    type Output = Value;
-
-    fn add(self, rhs: Self) -> Self::Output {
-        Value::new(self.data + rhs.data, vec![self, rhs])
-    }
-}
-
-impl Mul for Value {
-    type Output = Value;
-
-    fn mul(self, rhs: Self) -> Self::Output {
-        Value::new(self.data * rhs.data, vec![self, rhs])
-    }
-}
+mod engine;
+use crate::engine::Value;
 
 fn main() {
 
