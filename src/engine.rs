@@ -25,14 +25,15 @@ impl Value {
         let out = Rc::new(RefCell::new(Value{
             data: sum,
             grad: 0.0,
-            children: vec![lhs, rhs],
+            children: vec![Rc::clone(&lhs), Rc::clone(&rhs)],
             ops: '+',
             label,
             backward: None
         }));
 
         let backward = move |o: Rc<RefCell<Value>>| {
-            println!("Backward function for {} called", o.borrow().data);
+            lhs.borrow_mut().grad += o.borrow().grad;
+            rhs.borrow_mut().grad += o.borrow().grad;
         };
 
         out.borrow_mut().backward = Some(Box::new(backward));
@@ -49,14 +50,15 @@ impl Value {
         let out = Rc::new(RefCell::new(Value{
             data: mul,
             grad: 0.0,
-            children: vec![lhs, rhs],
+            children: vec![Rc::clone(&lhs), Rc::clone(&rhs)],
             ops: '*',
             label,
             backward: None
         }));
 
         let backward = move |o: Rc<RefCell<Value>>| {
-            println!("Backward function for {} called", o.borrow().label);
+            lhs.borrow_mut().grad += rhs_data * o.borrow().grad;
+            rhs.borrow_mut().grad += lhs_data * o.borrow().grad;
         };
 
         out.borrow_mut().backward = Some(Box::new(backward));
@@ -73,14 +75,14 @@ impl Value {
         let out = Rc::new(RefCell::new(Value{
             data: tanh,
             grad: 0.0,
-            children: vec![lhs],
+            children: vec![Rc::clone(&lhs)],
             ops: 't',
             label,
             backward: None
         }));
 
         let backward = move |o: Rc<RefCell<Value>>| {
-            println!("Backward function for {} called", o.borrow().label);
+            lhs.borrow_mut().grad += (1.0 - tanh.powi(2)) * o.borrow().grad;
         };
 
         out.borrow_mut().backward = Some(Box::new(backward));
