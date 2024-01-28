@@ -1,68 +1,76 @@
-use std::ops::Add;
-use std::ops::Mul;
 
-trait Backpropagation {
-    fn backward(&self);
-}
-
-#[derive(Debug)]
 #[allow(dead_code)]
-pub struct Value {
+pub struct Value<'a> {
     pub data: f64,
     pub grad: f64,
-    pub prev: Vec<Value>,
+    pub children: Vec<&'a Value<'a>>,
+    pub ops: char,
+    pub label: String,
+    pub backward: Box<dyn Fn() + 'a>
 }
 
-impl Backpropagation for Value {
-    fn backward(&self) {
+impl<'a> Value<'a> {
+
+    pub fn new(data: f64, label: String) -> Value<'a> {
+
+        fn none() {}
+
+        Value { data, grad: 0.0, children: vec![], ops: 'N', label, backward: Box::new(none) }
+
     }
-}
 
-impl Add for Value {
-    type Output = Value;
+    pub fn add(self: &'a Self, rhs: &'a Self) -> Value<'a> {
 
-    fn add(self, rhs: Self) -> Self::Output {
-        let mut out = Value::new(self.data + rhs.data, vec![self, rhs]);
-        out.backward_pass_add();
+        let backward = move || {
+            println!("{:?}", self.data);
+            println!("{:?}", self.label);
+        };
+
+        let out = Value { 
+            data: (self.data + rhs.data),
+            grad: 0.0,
+            children: vec![self, rhs],
+            ops: '+',
+            label: String::from("add"),
+            backward: Box::new(backward)
+        };
+
         return out;
+
     }
-}
 
-impl Mul for Value {
-    type Output = Value;
+    pub fn mul(self: &'a Self, rhs: &'a Self) -> Value<'a> {
 
-    fn mul(self, rhs: Self) -> Self::Output {
-        let mut out = Value::new(self.data * rhs.data, vec![self, rhs]);
-        out.backward_pass_mul();
+        fn none() {}
+
+        let out = Value {
+            data: (self.data * rhs.data),
+            grad: 0.0,
+            children: vec![self, rhs],
+            ops: '*',
+            label: String::from("mul"),
+            backward: Box::new(none)
+        };
+
         return out;
 
     }
-}
 
-impl Value {
+    pub fn tanh(self: &'a Self) -> Value<'a> {
 
-    pub fn new(data: f64, children: Vec<Value>) -> Value {
-        Value { data, grad: 0.0, prev: children }
-    }
+        fn none() {}
 
-    pub fn backward_pass_add(&mut self) {
-        self.prev[0].data += self.grad;
-        self.prev[1].data += self.grad;
-    }
-
-    pub fn backward_pass_mul(&mut self) {
-        self.prev[0].data += self.prev[1].data * self.grad;
-        self.prev[1].data += self.prev[0].data * self.grad;
-    }
-
-    pub fn backward_pass_sigmoid(&mut self) {
-        self.prev[0].grad +=  ((1.0 / (1.0 + (-self.data).exp())) * (1.0 - (1.0 / (1.0 + (-self.data).exp())))) * self.grad;
-    }
-
-    pub fn sigmoid(self) -> Value {
-        let mut out = Value::new(1.0 / (1.0 + (-self.data).exp()), vec![self, ]);
-        out.backward_pass_sigmoid();
+        let out = Value { 
+            data: (self.data.tanh()),
+            grad: 0.0,
+            children: vec![self], 
+            ops: 'T',
+            label: String::from("tanh"),
+            backward: Box::new(none)
+        };
+        
         return out;
+
     }
 
 }

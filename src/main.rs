@@ -1,28 +1,28 @@
 mod engine;
 use crate::engine::Value;
 
+#[allow(unused_mut)]
 fn main() {
 
-    let x1 = Value::new(2.0, vec![]);
-    let x2 = Value::new(0.0, vec![]);
+    let mut x1 = Value::new(2.0, String::from("x1"));
+    let mut x2 = Value::new(0.0, String::from("x2"));
 
-    let w1 = Value::new(-3.0, vec![]);
-    let w2 = Value::new(1.0, vec![]);
+    let mut w1 = Value::new(-3.0, String::from("w1"));
+    let mut w2 = Value::new(1.0, String::from("w2"));
 
-    let b = Value::new(6.8813735870195432, vec![]);
+    let mut b = Value::new(6.8813735870195432, String::from("b"));
 
-    let x1w1 = x1*w1;
-    let x2w2 = x2*w2;
+    let mut x1w1 = &mut x1.mul(&mut w1);
+    let mut x2w2 = &mut x2.mul(&mut w2);
 
-    let x1w1x2w2 = x1w1 + x2w2;
+    let mut x1w1x2w2 = &mut x1w1.add(&mut x2w2);
 
-    let n = x1w1x2w2 + b;
+    let mut n = &mut x1w1x2w2.add(&mut b);
 
-    let mut o = n.sigmoid();
+    let o = n.tanh();
 
-    o.grad = 1.0;
     println!("{:?}", o.data);
-    println!("{:#?}", o);
 
+    (x1w1x2w2.backward)();
 
 }
