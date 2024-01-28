@@ -5,7 +5,7 @@ use std::rc::Rc;
 
 use engine::Value;
 
-
+#[allow(unused_variables)]
 fn main() {
 
     let a = Rc::new(RefCell::new(Value::new(10.0, "a".to_string())));
@@ -15,7 +15,11 @@ fn main() {
     let c = Value::add(Rc::clone(&a), Rc::clone(&b), "c".to_string());
 
     let f = Value::mul(Rc::clone(&c), Rc::clone(&d), "f".to_string());
+    
+    let o = Value::tanh(Rc::clone(&f), "o".to_string());
 
-    println!("{:#?}", f);
+    if let Some(backward) = c.borrow().backward.as_ref() {
+        backward(Rc::clone(&a));
+    };
 
 }
