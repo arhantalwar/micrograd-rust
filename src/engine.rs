@@ -1,75 +1,54 @@
+use std::rc::Rc;
+use std::cell::RefCell;
 
-#[allow(dead_code)]
-pub struct Value<'a> {
+#[derive(Debug)]
+pub struct Value {
     pub data: f64,
     pub grad: f64,
-    pub children: Vec<&'a Value<'a>>,
+    pub children: Vec<Rc<RefCell<Value>>>,
     pub ops: char,
-    pub label: String,
-    pub backward: Box<dyn Fn() + 'a>
+    pub label: String
 }
 
-impl<'a> Value<'a> {
+impl Value {
 
-    pub fn new(data: f64, label: String) -> Value<'a> {
-
-        fn none() {}
-
-        Value { data, grad: 0.0, children: vec![], ops: 'N', label, backward: Box::new(none) }
-
+    pub fn new(data: f64, label: String) -> Value {
+        Value { data, grad: 0.0, children: vec![], ops: 'N', label }
     }
 
-    pub fn add(self: &'a Self, rhs: &'a Self) -> Value<'a> {
+    pub fn add(lhs: Rc<RefCell<Value>>, rhs: Rc<RefCell<Value>>, label: String) -> Rc<RefCell<Value>> {
 
-        let backward = move || {
-            println!("{:?}", self.data);
-            println!("{:?}", self.label);
-        };
+        let lhs_data = lhs.borrow().data;
+        let rhs_data = rhs.borrow().data;
+        let sum = lhs_data + rhs_data;
 
-        let out = Value { 
-            data: (self.data + rhs.data),
+        let out = Rc::new(RefCell::new(Value{
+            data: sum,
             grad: 0.0,
-            children: vec![self, rhs],
+            children: vec![lhs, rhs],
             ops: '+',
-            label: String::from("add"),
-            backward: Box::new(backward)
-        };
+            label
+        }));
 
-        return out;
+        out
 
     }
 
-    pub fn mul(self: &'a Self, rhs: &'a Self) -> Value<'a> {
+    pub fn mul(lhs: Rc<RefCell<Value>>, rhs: Rc<RefCell<Value>>, label: String) -> Rc<RefCell<Value>> {
 
-        fn none() {}
+        let lhs_data = lhs.borrow().data;
+        let rhs_data = rhs.borrow().data;
+        let mul = lhs_data * rhs_data;
 
-        let out = Value {
-            data: (self.data * rhs.data),
+        let out = Rc::new(RefCell::new(Value{
+            data: mul,
             grad: 0.0,
-            children: vec![self, rhs],
+            children: vec![lhs, rhs],
             ops: '*',
-            label: String::from("mul"),
-            backward: Box::new(none)
-        };
+            label
+        }));
 
-        return out;
-
-    }
-
-    pub fn tanh(self: &'a Self) -> Value<'a> {
-
-        fn none() {}
-
-        let out = Value { 
-            data: (self.data.tanh()),
-            grad: 0.0,
-            children: vec![self], 
-            ops: 'T',
-            label: String::from("tanh"),
-            backward: Box::new(none)
-        };
-        
-        return out;
+        out
 
     }
 
