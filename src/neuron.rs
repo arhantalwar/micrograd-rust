@@ -32,7 +32,7 @@ impl Neuron {
 
     }
 
-    pub fn forward_pass(neuron: &Rc<RefCell<Neuron>>, inputs: Vec<f64>) -> Rc<RefCell<Value>> {
+    pub fn forward_pass(neuron: &Rc<RefCell<Neuron>>, inputs: &Vec<f64>) -> Rc<RefCell<Value>> {
 
         let neuron_weights = &neuron.borrow().weights;
         let mut act: f64 = 0.0;
