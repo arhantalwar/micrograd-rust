@@ -1,9 +1,11 @@
 pub mod engine;
+pub mod neuron;
+pub mod layer;
 use engine::{Value, backward};
+use neuron::Neuron;
 
 use std::rc::Rc;
 
-#[allow(unused_variables)]
 fn main() {
 
     let x1 = Value::new(2.0, "x1".to_string());
@@ -23,14 +25,12 @@ fn main() {
 
     let o = Value::tanh(Rc::clone(&n), "o".to_string());
 
-    let a = Value::new(3.0, "a".to_string());
-    let b = Value::add(Rc::clone(&a), Rc::clone(&a), "b".to_string());
+    backward(&o);
 
-    let xs = backward(&b);
-    
-    for i in &xs {
-        println!("{:?} {:?} {:?}", i.borrow().label, i.borrow().data, i.borrow().grad);
-    }
+    let a = Neuron::new(2);
+    Neuron::forward_pass(&a, vec![1.0, 2.0]);
 
 
 }
+
+

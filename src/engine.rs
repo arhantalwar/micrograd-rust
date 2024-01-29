@@ -117,7 +117,7 @@ impl Value {
 
 }
 
-pub fn backward(root: &Rc<RefCell<Value>>) -> Vec<Rc<RefCell<Value>>> {
+pub fn backward(root: &Rc<RefCell<Value>>) {
 
     let mut visited: Vec<Rc<RefCell<Value>>> = Vec::new();
     let mut topo: Vec<Rc<RefCell<Value>>> = Vec::new();
@@ -134,7 +134,6 @@ pub fn backward(root: &Rc<RefCell<Value>>) -> Vec<Rc<RefCell<Value>>> {
         };
     }
 
-    topo
 }
 
 pub fn build_topo(root: &Rc<RefCell<Value>>,
@@ -150,11 +149,3 @@ pub fn build_topo(root: &Rc<RefCell<Value>>,
     }
 
 }
-
-
-
-
-
-
-
-
