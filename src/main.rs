@@ -1,5 +1,5 @@
 pub mod engine;
-use engine::Value;
+use engine::{Value, build_topo, backward};
 
 use std::rc::Rc;
 
@@ -25,36 +25,43 @@ fn main() {
 
     o.borrow_mut().grad = 1.0;
 
-    if let Some(backward) = o.borrow().backward.as_ref() {
-        backward(Rc::clone(&o));
-    };
+    let mut xs = backward(&o);
+    xs.reverse();
 
-    if let Some(backward) = n.borrow().backward.as_ref() {
-        backward(Rc::clone(&n));
-    };
+    for i in &xs {
+        println!("{:?}", i.borrow().label)
+    }
 
-    if let Some(backward) = x1w1x2w2.borrow().backward.as_ref() {
-        backward(Rc::clone(&x1w1x2w2));
-    };
-
-    if let Some(backward) = x2w2.borrow().backward.as_ref() {
-        backward(Rc::clone(&x2w2));
-    };
-
-    if let Some(backward) = x1w1.borrow().backward.as_ref() {
-        backward(Rc::clone(&x1w1));
-    };
-
-    println!("{:?}", o.borrow().grad);
-    println!("{:?}", n.borrow().grad);
-    println!("{:?}", b.borrow().grad);
-    println!("{:?}", x1w1x2w2.borrow().grad);
-    println!("{:?}", x1w1.borrow().grad);
-    println!("{:?}", x2w2.borrow().grad);
-    println!("{:?}", w2.borrow().grad);
-    println!("{:?}", x2.borrow().grad);
-    println!("{:?}", w1.borrow().grad);
-    println!("{:?}", x1.borrow().grad);
-
+    // if let Some(backward) = o.borrow().backward.as_ref() {
+    //     backward(Rc::clone(&o));
+    // };
+    //
+    // if let Some(backward) = n.borrow().backward.as_ref() {
+    //     backward(Rc::clone(&n));
+    // };
+    //
+    // if let Some(backward) = x1w1x2w2.borrow().backward.as_ref() {
+    //     backward(Rc::clone(&x1w1x2w2));
+    // };
+    //
+    // if let Some(backward) = x2w2.borrow().backward.as_ref() {
+    //     backward(Rc::clone(&x2w2));
+    // };
+    //
+    // if let Some(backward) = x1w1.borrow().backward.as_ref() {
+    //     backward(Rc::clone(&x1w1));
+    // };
+    //
+    // println!("{:?}", o.borrow().grad);
+    // println!("{:?}", n.borrow().grad);
+    // println!("{:?}", b.borrow().grad);
+    // println!("{:?}", x1w1x2w2.borrow().grad);
+    // println!("{:?}", x1w1.borrow().grad);
+    // println!("{:?}", x2w2.borrow().grad);
+    // println!("{:?}", w2.borrow().grad);
+    // println!("{:?}", x2.borrow().grad);
+    // println!("{:?}", w1.borrow().grad);
+    // println!("{:?}", x1.borrow().grad);
+    //
 
 }

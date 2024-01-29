@@ -13,7 +13,24 @@ pub struct Value {
 
 impl Debug for Value {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        todo!()
+        f.debug_struct("Value")
+            .field("data", &self.data)
+            .field("grad", &self.grad)
+            .field("children", &self.children)
+            .field("ops", &self.ops)
+            .field("label", &self.label)
+            .finish()
+            
+    }
+}
+
+impl PartialEq for Value {
+    fn eq(&self, other: &Self) -> bool {
+        if self.label == other.label {
+            true
+        } else {
+            false
+        }
     }
 }
 
@@ -99,3 +116,35 @@ impl Value {
     }
 
 }
+
+pub fn backward(root: &Rc<RefCell<Value>>) -> Vec<Rc<RefCell<Value>>> {
+
+    let mut visited: Vec<Rc<RefCell<Value>>> = Vec::new();
+    let mut topo: Vec<Rc<RefCell<Value>>> = Vec::new();
+
+    build_topo(root, &mut visited, &mut topo);
+
+    topo
+}
+
+pub fn build_topo(root: &Rc<RefCell<Value>>,
+                  visited: &mut Vec<Rc<RefCell<Value>>>,
+                  topo: &mut Vec<Rc<RefCell<Value>>>) {
+
+    if !visited.contains(root) {
+        visited.push(Rc::clone(root));
+        for child in &root.borrow().children {
+            build_topo(child, visited, topo)
+        }
+        topo.push(Rc::clone(root));
+    }
+
+}
+
+
+
+
+
+
+
+
