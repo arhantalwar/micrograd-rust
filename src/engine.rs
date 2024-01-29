@@ -124,6 +124,16 @@ pub fn backward(root: &Rc<RefCell<Value>>) -> Vec<Rc<RefCell<Value>>> {
 
     build_topo(root, &mut visited, &mut topo);
 
+    topo.reverse();
+
+    root.borrow_mut().grad = 1.0;
+
+    for i in &topo {
+        if let Some(backward) = i.borrow().backward.as_ref() {
+            backward(Rc::clone(&i));
+        };
+    }
+
     topo
 }
 

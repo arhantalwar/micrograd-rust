@@ -1,5 +1,5 @@
 pub mod engine;
-use engine::{Value, build_topo, backward};
+use engine::{Value, backward};
 
 use std::rc::Rc;
 
@@ -10,7 +10,7 @@ fn main() {
     let x2 = Value::new(0.0, "x2".to_string());
 
     let w1 = Value::new(-3.0, "w1".to_string());
-    let w2 = Value::new(1.0, "ww".to_string());
+    let w2 = Value::new(1.0, "w2".to_string());
 
     let b = Value::new(6.8813735870, "b".to_string());
 
@@ -23,45 +23,14 @@ fn main() {
 
     let o = Value::tanh(Rc::clone(&n), "o".to_string());
 
-    o.borrow_mut().grad = 1.0;
+    let a = Value::new(3.0, "a".to_string());
+    let b = Value::add(Rc::clone(&a), Rc::clone(&a), "b".to_string());
 
-    let mut xs = backward(&o);
-    xs.reverse();
-
+    let xs = backward(&b);
+    
     for i in &xs {
-        println!("{:?}", i.borrow().label)
+        println!("{:?} {:?} {:?}", i.borrow().label, i.borrow().data, i.borrow().grad);
     }
 
-    // if let Some(backward) = o.borrow().backward.as_ref() {
-    //     backward(Rc::clone(&o));
-    // };
-    //
-    // if let Some(backward) = n.borrow().backward.as_ref() {
-    //     backward(Rc::clone(&n));
-    // };
-    //
-    // if let Some(backward) = x1w1x2w2.borrow().backward.as_ref() {
-    //     backward(Rc::clone(&x1w1x2w2));
-    // };
-    //
-    // if let Some(backward) = x2w2.borrow().backward.as_ref() {
-    //     backward(Rc::clone(&x2w2));
-    // };
-    //
-    // if let Some(backward) = x1w1.borrow().backward.as_ref() {
-    //     backward(Rc::clone(&x1w1));
-    // };
-    //
-    // println!("{:?}", o.borrow().grad);
-    // println!("{:?}", n.borrow().grad);
-    // println!("{:?}", b.borrow().grad);
-    // println!("{:?}", x1w1x2w2.borrow().grad);
-    // println!("{:?}", x1w1.borrow().grad);
-    // println!("{:?}", x2w2.borrow().grad);
-    // println!("{:?}", w2.borrow().grad);
-    // println!("{:?}", x2.borrow().grad);
-    // println!("{:?}", w1.borrow().grad);
-    // println!("{:?}", x1.borrow().grad);
-    //
 
 }
