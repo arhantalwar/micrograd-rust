@@ -1,3 +1,4 @@
+use std::fmt::Debug;
 use std::rc::Rc;
 use std::cell::RefCell;
 
@@ -10,10 +11,16 @@ pub struct Value {
     pub backward: Option<Box<dyn Fn(Rc<RefCell<Value>>)>>
 }
 
+impl Debug for Value {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        todo!()
+    }
+}
+
 impl Value {
 
-    pub fn new(data: f64, label: String) -> Value {
-        Value { data, grad: 0.0, children: vec![], ops: 'N', label, backward: None }
+    pub fn new(data: f64, label: String) -> Rc<RefCell<Value>> {
+        Rc::new(RefCell::new(Value { data, grad: 0.0, children: vec![], ops: 'N', label, backward: None }))
     }
 
     pub fn add(lhs: Rc<RefCell<Value>>, rhs: Rc<RefCell<Value>>, label: String) -> Rc<RefCell<Value>> {
