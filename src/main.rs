@@ -1,18 +1,19 @@
 pub mod engine;
 pub mod neuron;
 pub mod layer;
-use layer::Layer;
+pub mod mlp;
+use mlp::MLP;
 use neuron::Neuron;
 
 fn main() {
 
-    let a = Layer::new(1, 1);
-    let x = vec![2.0];
+    let x = vec![2.0, 3.0, -1.0];
+    let n = MLP::new(3, vec![4, 4, 1]);
+    let f = MLP::eval(&n, &x);
 
-    let z = Layer::eval(&a, &x);
-
-    dbg!(z);
-
+    for i in f {
+        println!("{:?}", i)
+    }
 }
 
 
