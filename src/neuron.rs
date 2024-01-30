@@ -34,17 +34,27 @@ impl Neuron {
 
     pub fn forward_pass(neuron: &Rc<RefCell<Neuron>>, inputs: &Vec<f64>) -> Rc<RefCell<Value>> {
 
+        let mut rng = rand::thread_rng();
+
         let neuron_weights = &neuron.borrow().weights;
-        let mut act: f64 = 0.0;
+        let neuron_bias = neuron.borrow().bias.borrow().data;
+
+        let act_val = Value::new(0.0, format!("act_val{:?}", rng.gen_range(0.0..1000.0)));
 
         for (i, j) in neuron_weights.iter().zip(inputs.iter()) {
-            act += i.borrow().data * j;
+
+            let j_val = Value::new(j.clone(), format!("j_val{:?}", rng.gen_range(0.0..1000.0)));
+            let act_mul = Value::mul(i.clone(), j_val, format!("act{:?}", rng.gen_range(0.0..=1000.0)));
+
+            let temp = Value::add(act_val.clone(), act_mul, format!("tmp{:?}", rng.gen_range(0.0..=1000.0)));
+            act_val.borrow_mut().data += temp.borrow().data;
+
         }
 
-        act += neuron.borrow().bias.borrow().data;
-        let out = act.tanh();
+        act_val.borrow_mut().data += neuron_bias;
+        let out = Value::tanh(act_val, format!("out{:?}", rng.gen_range(0.0..1000.0)));
 
-        Value::new(out, format!("out{:?}", out))
+        out
     
     }
 

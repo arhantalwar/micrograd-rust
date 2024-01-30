@@ -18,7 +18,6 @@ impl MLP {
         let mut layers: Vec<Rc<RefCell<Layer>>> = Vec::new();
 
         for i in 0..no_of_outputs.len() {
-            // println!("Layer -> {:?} {:?}", *sz.get(i).unwrap(), *sz.get(i + 1).unwrap());
             layers.push(Layer::new(*sz.get(i).unwrap(), *sz.get(i + 1).unwrap()));
         }
 
@@ -34,8 +33,6 @@ impl MLP {
         let mut x_inputs: Vec<f64> = inputs.clone();
 
         for layer in &mlp.borrow().layers {
-
-            println!("Passing input {:?}", x_inputs);
 
             x = Layer::eval(&layer, &x_inputs);
 

@@ -26,11 +26,7 @@ impl Debug for Value {
 
 impl PartialEq for Value {
     fn eq(&self, other: &Self) -> bool {
-        if self.label == other.label {
-            true
-        } else {
-            false
-        }
+        self.label == other.label
     }
 }
 
@@ -49,7 +45,7 @@ impl Value {
         let out = Rc::new(RefCell::new(Value{
             data: sum,
             grad: 0.0,
-            children: vec![Rc::clone(&lhs), Rc::clone(&rhs)],
+            children: vec![lhs.clone(), rhs.clone()],
             ops: '+',
             label,
             backward: None
@@ -74,7 +70,7 @@ impl Value {
         let out = Rc::new(RefCell::new(Value{
             data: mul,
             grad: 0.0,
-            children: vec![Rc::clone(&lhs), Rc::clone(&rhs)],
+            children: vec![lhs.clone(), rhs.clone()],
             ops: '*',
             label,
             backward: None
@@ -99,7 +95,7 @@ impl Value {
         let out = Rc::new(RefCell::new(Value{
             data: tanh,
             grad: 0.0,
-            children: vec![Rc::clone(&lhs)],
+            children: vec![lhs.clone()],
             ops: 't',
             label,
             backward: None

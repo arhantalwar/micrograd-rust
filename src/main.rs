@@ -3,17 +3,25 @@ pub mod neuron;
 pub mod layer;
 pub mod mlp;
 
-use mlp::MLP;
+use layer::Layer;
 use crate::neuron::Neuron;
 
 fn main() {
 
-    let x = vec![2.0, 3.0, -1.0];
-    let n = MLP::new(3, vec![4, 4, 1]);
-    let z = MLP::eval(&n, &x);
+    let a = Layer::new(2, 1);
+    let b = Layer::eval(&a, vec![2.0, 0.0].as_ref());
 
-    dbg!(z);
+    println!("{:#?}", a);
+    println!("{:#?}", b);
 
 }
+
+
+
+
+
+
+
+
 
 
