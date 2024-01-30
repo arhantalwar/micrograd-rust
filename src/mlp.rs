@@ -3,8 +3,9 @@ use std::{rc::Rc, cell::RefCell};
 use crate::layer::Layer;
 use crate::engine::Value;
 
+#[derive(Debug)]
 pub struct MLP {
-    layers: Vec<Rc<RefCell<Layer>>>,
+    pub layers: Vec<Rc<RefCell<Layer>>>,
 }
 
 impl MLP {
@@ -17,7 +18,8 @@ impl MLP {
         let mut layers: Vec<Rc<RefCell<Layer>>> = Vec::new();
 
         for i in 0..no_of_outputs.len() {
-            layers.push(Layer::new(i as i32, (i as i32)+1));
+            // println!("Layer -> {:?} {:?}", *sz.get(i).unwrap(), *sz.get(i + 1).unwrap());
+            layers.push(Layer::new(*sz.get(i).unwrap(), *sz.get(i + 1).unwrap()));
         }
 
         Rc::new(RefCell::new(MLP {
@@ -26,12 +28,23 @@ impl MLP {
 
     }
 
-    pub fn eval(mlp: &Rc<RefCell<MLP>>, inputs: &Vec<f64>) -> Vec<Vec<Rc<RefCell<Value>>>> {
+    pub fn eval(mlp: &Rc<RefCell<MLP>>, inputs: &Vec<f64>) -> Vec<Rc<RefCell<Value>>> {
 
-        let mut x: Vec<Vec<Rc<RefCell<Value>>>> = Vec::new();
+        let mut x: Vec<Rc<RefCell<Value>>> = Vec::new();
+        let mut x_inputs: Vec<f64> = inputs.clone();
 
         for layer in &mlp.borrow().layers {
-            x.push(Layer::eval(layer, inputs));
+
+            println!("Passing input {:?}", x_inputs);
+
+            x = Layer::eval(&layer, &x_inputs);
+
+            x_inputs.clear();
+
+            for i in &x {
+                x_inputs.push(i.borrow().data);
+            }
+
         }
 
         x

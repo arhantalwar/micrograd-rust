@@ -5,7 +5,9 @@ use crate::Neuron;
 use crate::engine::Value;
 
 #[derive(Debug)]
-pub struct Layer(Vec<Rc<RefCell<Neuron>>>);
+pub struct Layer {
+    pub neurons: Vec<Rc<RefCell<Neuron>>>,
+}
 
 impl Layer {
 
@@ -17,7 +19,9 @@ impl Layer {
             neurons.push(Neuron::new(no_of_inputs));
         }
 
-        Rc::new(RefCell::new(Layer(neurons)))
+        Rc::new(RefCell::new(Layer{
+            neurons
+        }))
 
     }
 
@@ -25,7 +29,7 @@ impl Layer {
 
         let mut out: Vec<Rc<RefCell<Value>>> = Vec::new();
 
-        for n in &layer.borrow().0 {
+        for n in &layer.borrow().neurons {
             let a = Neuron::forward_pass(&n, inputs);
             out.push(a);
         }
