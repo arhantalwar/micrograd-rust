@@ -16,13 +16,11 @@ impl Neuron {
         let mut weights: Vec<Rc<RefCell<Value>>> = Vec::new();
         let mut rng = rand::thread_rng();
 
-        // Init random weights
         for _ in 0..no_of_inputs {
             let w = Value::new(rng.gen_range(-1.0..=1.0), format!("w{:?}", rng.gen_range(0.00..100.00)));
             weights.push(w);
         }
 
-        // Init random bais
         let bias = Value::new(rng.gen_range(-1.0..=1.0), format!("b{:?}", rng.gen_range(-1.0..=1.0)));
 
         Rc::new(RefCell::new(Neuron {
@@ -35,34 +33,98 @@ impl Neuron {
     pub fn forward_pass(neuron: &Rc<RefCell<Neuron>>, inputs: &Vec<f64>) -> Rc<RefCell<Value>> {
 
         let mut random_number_gen = rand::thread_rng();
+        let mut list_of_weight_input: Vec<Rc<RefCell<Value>>> = vec![];
 
         let neuron_weights = &neuron.borrow().weights;
         let neuron_bias = &neuron.borrow().bias;
 
-        let act_temp_1 = Value::new(0.0, "act_temp_1".to_string());
-
-        let activation_sum_accumaltor = Value::add(act_temp_1,
-                                                   neuron_bias.clone(),
-                                                   format!("Act_{:?}", random_number_gen.gen_range(101.00..=200.00)));
-
         for (weight, input) in neuron_weights.iter().zip(inputs) {
 
-            let input_value = Value::new(*input, format!("Input_{:?}", random_number_gen.gen_range(0.00..=100.00)));
+            let input_val = Value::new(*input,
+                                       format!("Input_Value_{:?}", random_number_gen.gen_range(0.0..=50.0)));
 
-            let temp_for_mul = Value::mul(
-                weight.clone(), 
-                input_value,
-                format!("Input_weight_mul_{:?}", random_number_gen.gen_range(0.00..=100.00)));
+            let mul_val = Value::mul(weight.clone(),
+                                     input_val,
+                                     format!("Mul_Value_{:?}", random_number_gen.gen_range(50.0..=100.0)));
 
-            activation_sum_accumaltor.borrow_mut().data += temp_for_mul.borrow().data;
-            activation_sum_accumaltor.borrow_mut().children.push(temp_for_mul.clone());
+            list_of_weight_input.push(mul_val);
 
         }
 
-        let out = Value::tanh(activation_sum_accumaltor, format!("Tan_{:?}", random_number_gen.gen_range(201.00..=300.00)));
+        let new_list = list_sum(list_of_weight_input);
+        let list_sum = new_list.first().unwrap();
+
+        let adding_bias = Value::add(
+            neuron_bias.clone(),
+            list_sum.clone(),
+            format!("BIAS_{:?}", random_number_gen.gen_range(151.0..=200.0)));
+
+        let out = Value::tanh(adding_bias,
+                              format!("TANH_{:?}", random_number_gen.gen_range(721.0..=821.0)));
 
         out
 
     }
 
 }
+
+fn list_sum(list: Vec<Rc<RefCell<Value>>>) -> Vec<Rc<RefCell<Value>>> {
+
+    let mut random_number_gen = rand::thread_rng();
+
+    if list.len() == 1 {
+
+        return list;
+
+    } else if list.len() % 2 == 0 {
+
+        let mut new_list: Vec<Rc<RefCell<Value>>> = vec![];
+
+        for i in list.chunks(2) {
+
+            let add_val = Value::add(
+                i.get(0).unwrap().clone(),
+                i.get(1).unwrap().clone(),
+                format!("ADD_VAL_{:?}", random_number_gen.gen_range(50.0..=100.0)));
+
+            new_list.push(add_val);
+
+        }
+
+        list_sum(new_list);
+
+    } else if list.len() % 2 != 0 {
+
+        let mut new_list: Vec<Rc<RefCell<Value>>> = vec![];
+
+        let mut list_copy = list.clone();
+        let extra_val = list_copy.pop().unwrap();
+
+        for i in list_copy.chunks(2) {
+
+            let add_val = Value::add(
+                i.get(0).unwrap().clone(),
+                i.get(1).unwrap().clone(),
+                format!("ADD_VAL_{:?}", random_number_gen.gen_range(50.0..=100.0)));
+
+            new_list.push(add_val);
+
+        }
+
+        new_list.push(extra_val);
+
+        list_sum(new_list);
+
+    }
+
+    list
+
+}
+
+
+
+
+
+
+
+

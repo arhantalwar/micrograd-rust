@@ -126,9 +126,7 @@ pub fn backward(root: &Rc<RefCell<Value>>) {
 
     for i in &topo {
         if let Some(backward) = i.borrow().backward.as_ref() {
-            println!("\tcalling backward for {:?}", i.borrow().label);
             backward(i.clone());
-            println!("\t\tValue afterward {:?}", i.borrow().grad);
         };
     }
 
@@ -140,7 +138,6 @@ pub fn build_topo(root: &Rc<RefCell<Value>>,
 
     if !visited.contains(root) {
         visited.push(Rc::clone(root));
-        // println!("pushed {:?} to visited", root.borrow().label);
         for child in &root.borrow().children {
             build_topo(child, visited, topo)
         }
