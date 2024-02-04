@@ -54,6 +54,7 @@ impl Neuron {
         let new_list = list_sum(list_of_weight_input);
         let list_sum = new_list.first().unwrap();
 
+
         let adding_bias = Value::add(
             neuron_bias.clone(),
             list_sum.clone(),
@@ -91,7 +92,7 @@ fn list_sum(list: Vec<Rc<RefCell<Value>>>) -> Vec<Rc<RefCell<Value>>> {
 
         }
 
-        list_sum(new_list);
+        return list_sum(new_list);
 
     } else if list.len() % 2 != 0 {
 
@@ -113,11 +114,11 @@ fn list_sum(list: Vec<Rc<RefCell<Value>>>) -> Vec<Rc<RefCell<Value>>> {
 
         new_list.push(extra_val);
 
-        list_sum(new_list);
+        return list_sum(new_list);
 
     }
 
-    list
+    unreachable!();
 
 }
 
