@@ -69,7 +69,7 @@ impl Neuron {
 
 }
 
-fn list_sum(list: Vec<Rc<RefCell<Value>>>) -> Vec<Rc<RefCell<Value>>> {
+pub fn list_sum(list: Vec<Rc<RefCell<Value>>>) -> Vec<Rc<RefCell<Value>>> {
 
     let mut random_number_gen = rand::thread_rng();
 

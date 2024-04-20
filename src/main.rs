@@ -5,20 +5,28 @@ pub mod mlp;
 
 use mlp::MLP;
 use neuron::Neuron;
+
 use crate::engine::backward;
 
 fn main() {
 
-    let a = MLP::new(3, vec![4, 4, 1]);
-    let o = MLP::eval(&a, &vec![1.0, 2.0, -3.0]);
+    let n = MLP::new(3, vec![4, 4, 1]);
+    let xs = vec![
+        vec![2.0, 3.0, -1.0],
+        vec![3.0, -1.0, 0.5],
+        vec![0.5, 1.0,  1.0],
+        vec![1.0, 1.0, -1.0],
+    ];
 
-    for i in &o {
-        backward(i);
-    }
+    // let ys = vec![1.0, -1.0, -1.0, 1.0];
+    let ypred = xs.iter().map(|x| MLP::eval(&n, x)).collect::<Vec<_>>();
 
-    println!("Output: {:#?}", o.get(0).unwrap().borrow().data);
+    ypred.iter().for_each(|x| x.iter().for_each(|y| backward(y)));
+
+    println!("{:#?}", ypred);
 
 }
+
 
 
 

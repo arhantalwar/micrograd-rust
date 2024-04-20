@@ -26,7 +26,7 @@ impl Debug for Value {
 
 impl PartialEq for Value {
     fn eq(&self, other: &Self) -> bool {
-        self.label == other.label
+        self.data == other.data
     }
 }
 
